@@ -2,67 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Question for You...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Kannama ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CORE VISUALS & RESET --- */
+        /* --- CORE VISUALS --- */
         :root {
-            --primary: #ff4d6d;
-            --secondary: #ff8fa3;
-            --bg: #1a0b12;
-            --text: #fff0f3;
-            --glass: rgba(255, 255, 255, 0.1);
+            --primary: #ff0a54;
+            --secondary: #ff477e;
+            --accent: #ffbd00;
+            --text: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(-45deg, #2b0c16, #52081f, #2e0828, #0f0518);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--text);
-            overflow: hidden; /* Prevent scrolling, we handle it with JS */
+            overflow: hidden;
             height: 100vh;
             width: 100vw;
         }
 
-        /* --- ANIMATED BACKGROUND --- */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- FLOATING PARTICLES --- */
         .bg-hearts {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             overflow: hidden;
-            z-index: -1;
+            z-index: 0;
+            pointer-events: none;
         }
         
-        .heart {
+        .floating-heart {
             position: absolute;
-            background: var(--primary);
-            width: 20px; height: 20px;
-            transform: rotate(45deg);
-            opacity: 0.3;
-            animation: float 10s infinite ease-in;
-        }
-        .heart::before, .heart::after {
-            content: '';
-            position: absolute;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
-        .heart::before { top: -10px; left: 0; }
-        .heart::after { left: -10px; top: 0; }
-
-        @keyframes float {
-            0% { transform: translateY(110vh) rotate(45deg) scale(0.5); opacity: 0; }
-            50% { opacity: 0.6; }
-            100% { transform: translateY(-10vh) rotate(45deg) scale(1.2); opacity: 0; }
+            font-size: 2rem;
+            animation: floatUp linear infinite;
+            opacity: 0;
+            text-shadow: 0 0 10px rgba(255, 71, 126, 0.5);
         }
 
-        /* --- MAIN SLIDER CONTAINER --- */
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- SLIDER CONTAINER --- */
         .container {
             display: flex;
-            width: 500%; /* 5 Slides, so 500% width */
+            width: 500%;
             height: 100vh;
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 10;
+            position: relative;
         }
 
         .slide {
@@ -73,122 +76,166 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            perspective: 1000px;
         }
 
-        /* --- PHOTO FRAMES --- */
+        /* --- HIGH END 3D CARD --- */
+        .photo-wrapper {
+            perspective: 1000px;
+            margin-bottom: 40px;
+            z-index: 20;
+        }
+
         .photo-frame {
-            width: 300px;
-            height: 400px;
-            background: var(--glass);
-            border: 2px solid rgba(255,255,255,0.2);
+            width: 320px;
+            height: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             padding: 15px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: rotateY(0deg) rotateX(0deg);
-            transition: transform 0.5s ease;
-            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(255, 10, 84, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            transition: transform 0.1s ease-out; /* Smooth follow for JS */
+            position: relative;
         }
-        
-        /* 3D Tilt Effect on Hover */
-        .photo-frame:hover {
-            transform: rotateY(5deg) rotateX(5deg) scale(1.02);
+
+        .photo-frame::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border-radius: 22px;
+            background: linear-gradient(45deg, #ff0a54, transparent, #ffbd00);
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(10px);
         }
 
         .photo-frame img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
-            display: block;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         /* --- TEXT STYLING --- */
         .caption-box {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 25px 40px;
             border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            max-width: 80%;
+            max-width: 85%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
+            /* Entry Animation */
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 1s ease 0.3s; /* Delayed animation */
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s;
         }
 
-        /* Class to trigger animation when slide is active */
         .active .caption-box {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
-        h2 { font-size: 2rem; margin-bottom: 10px; color: var(--secondary); }
-        p { font-size: 1.2rem; line-height: 1.6; }
+        h2 { 
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem; 
+            margin-bottom: 15px; 
+            color: var(--secondary);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        p { 
+            font-size: 1.3rem; 
+            line-height: 1.6; 
+            color: #eee;
+        }
 
         /* --- NAVIGATION --- */
         .controls {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 40px;
+            width: 100%;
             display: flex;
-            gap: 20px;
+            justify-content: center;
+            gap: 40px;
             z-index: 100;
         }
 
         button.nav-btn {
-            background: transparent;
-            border: 2px solid var(--text);
-            color: var(--text);
-            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 12px 30px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            backdrop-filter: blur(5px);
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         button.nav-btn:hover {
-            background: var(--text);
-            color: var(--bg);
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary);
+            transform: translateY(-3px);
         }
 
-        /* --- THE FINAL ASK --- */
+        /* --- FINAL SLIDE & BUTTONS --- */
         .final-slide h1 {
-            font-size: 3.5rem;
-            text-shadow: 0 0 20px var(--primary);
-            margin-bottom: 40px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 4.5rem;
+            background: linear-gradient(to right, #ff0a54, #ffbd00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 50px;
             text-align: center;
+            filter: drop-shadow(0 0 15px rgba(255, 10, 84, 0.5));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         .buttons-container {
             display: flex;
-            gap: 30px;
+            gap: 40px;
+            align-items: center;
         }
 
         .yes-btn {
-            background: var(--primary);
+            background: linear-gradient(45deg, #ff0a54, #ff477e);
             color: white;
             border: none;
-            padding: 20px 60px;
-            font-size: 2rem;
-            border-radius: 50px;
+            padding: 25px 80px;
+            font-size: 2.5rem;
+            font-family: 'Dancing Script', cursive;
+            border-radius: 60px;
             cursor: pointer;
-            box-shadow: 0 0 30px var(--primary);
-            transition: transform 0.2s;
+            box-shadow: 0 0 40px rgba(255, 10, 84, 0.6);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 200;
         }
 
-        .yes-btn:hover { transform: scale(1.1); }
+        .yes-btn:hover { 
+            transform: scale(1.15) rotate(-3deg); 
+        }
 
         .no-btn {
-            background: transparent;
-            border: 2px solid #555;
-            color: #777;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #999;
+            color: #ccc;
             padding: 15px 40px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: 0.2s;
+            position: relative;
         }
 
         /* --- CONFETTI CANVAS --- */
@@ -199,60 +246,71 @@
             pointer-events: none;
             z-index: 999;
         }
-        
-        /* Mobile responsiveness */
+
+        /* --- MOBILE ADJUSTMENTS --- */
         @media (max-width: 768px) {
-            .photo-frame { width: 80vw; height: 50vh; }
-            .final-slide h1 { font-size: 2.5rem; }
-            .yes-btn { padding: 15px 40px; font-size: 1.5rem; }
+            .photo-frame { width: 85vw; height: 50vh; margin-bottom: 20px; }
+            h2 { font-size: 2.5rem; }
+            p { font-size: 1.1rem; padding: 0 10px; }
+            .caption-box { padding: 20px; width: 90%; }
+            .final-slide h1 { font-size: 3rem; }
+            .yes-btn { padding: 20px 50px; font-size: 2rem; }
+            .buttons-container { flex-direction: column; gap: 20px; }
         }
     </style>
 </head>
 <body>
 
     <div class="bg-hearts" id="hearts-container"></div>
-
     <canvas id="confetti-canvas"></canvas>
 
     <div class="container" id="slider">
 
         <div class="slide active">
-            <div class="photo-frame">
-                <img src="beach.JPG" alt="Our Hand Prints in Atlantic City Beach">
+            <div class="photo-wrapper">
+                <div class="photo-frame">
+                    <img src="beach.JPG" alt="Our Hand Prints in Atlantic City Beach">
+                </div>
             </div>
             <div class="caption-box">
                 <h2>Hi Kannama,</h2>
-                <p>I wanted to make something special just for you...</p>
+                <p>I wanted to create a universe just for us...</p>
             </div>
         </div>
 
         <div class="slide">
-            <div class="photo-frame">
-                <img src="smile.JPG" alt="At Lantern Festival">
+            <div class="photo-wrapper">
+                <div class="photo-frame">
+                    <img src="smile.JPG" alt="At Lantern Festival">
+                </div>
             </div>
             <div class="caption-box">
-                <h2>Do you remember this?</h2>
-                <p>This was such a happy day. I love your smile here.</p>
+                <h2>That Smile</h2>
+                <p>This day was perfect. But honestly, every day you smile is perfect.</p>
             </div>
         </div>
 
         <div class="slide">
-            <div class="photo-frame">
-                <img src="rock.JPG" alt="Boone Trip">
+            <div class="photo-wrapper">
+                <div class="photo-frame">
+                    <img src="rock.JPG" alt="Boone Trip">
+                </div>
             </div>
             <div class="caption-box">
-                <h2>My Favorite Moments</h2>
-                <p>Every moment with you feels like an adventure.</p>
+                <h2>Our Adventures</h2>
+                <p>From the quiet moments to the crazy trips, I love it all.</p>
             </div>
         </div>
 
         <div class="slide">
-            <div class="photo-frame">
-                <img src="bright.JPG" alt="At Dix Park">
+            <div class="photo-wrapper">
+                <div class="photo-frame">
+                    <img src="bright.JPG" alt="At Dix Park">
+                </div>
             </div>
             <div class="caption-box">
-                <h2>Because of you...</h2>
-                <p>Life is brighter, funnier, and just better.</p>
+                <h2>You Light Up My World</h2>
+                <p>Life is just brighter, funnier, and warmer with you.</p>
             </div>
         </div>
 
@@ -260,7 +318,7 @@
             <h1>Will you be my Valentine?</h1>
             <div class="buttons-container">
                 <button class="yes-btn" onclick="celebrate()">YES!</button>
-                <button class="no-btn" id="noBtn" onmouseover="moveButton()">No</button>
+                <button class="no-btn" id="noBtn" onmouseover="moveButton()" onclick="moveButton()">No</button>
             </div>
         </div>
 
@@ -272,31 +330,36 @@
     </div>
 
     <script>
-        /* --- BACKGROUND HEARTS GENERATOR --- */
+        /* --- 1. PARTICLE BACKGROUND --- */
         function createHearts() {
             const container = document.getElementById('hearts-container');
-            const heartCount = 20;
-            for(let i=0; i<heartCount; i++){
+            const emojis = ['❤️', '💖', '✨', '🌹'];
+            
+            for(let i=0; i<30; i++){
                 const heart = document.createElement('div');
-                heart.classList.add('heart');
+                heart.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                heart.classList.add('floating-heart');
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = Math.random() * 5 + 5 + 's';
-                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.animationDuration = Math.random() * 10 + 10 + 's';
+                heart.style.animationDelay = Math.random() * 10 + 's';
+                heart.style.fontSize = Math.random() * 20 + 20 + 'px';
                 container.appendChild(heart);
             }
         }
         createHearts();
 
-        /* --- SLIDER LOGIC --- */
+        /* --- 2. SLIDER & SWIPE LOGIC --- */
         let currentSlide = 0;
         const totalSlides = 5;
         const slider = document.getElementById('slider');
         const slides = document.querySelectorAll('.slide');
 
+        // Touch handling variables
+        let touchStartX = 0;
+        let touchEndX = 0;
+
         function updateSlide() {
             slider.style.transform = `translateX(-${currentSlide * 20}%)`;
-            
-            // Manage "active" class for text animations
             slides.forEach(s => s.classList.remove('active'));
             slides[currentSlide].classList.add('active');
         }
@@ -315,15 +378,55 @@
             }
         }
 
-        /* --- FUN "NO" BUTTON LOGIC --- */
-        function moveButton() {
-            const btn = document.getElementById('noBtn');
-            const x = Math.random() * 200 - 100; // Move left/right
-            const y = Math.random() * 200 - 100; // Move up/down
-            btn.style.transform = `translate(${x}px, ${y}px)`;
+        // Add Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') nextSlide();
+            if(e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Add Touch/Swipe Navigation
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide(); // Swipe Left
+            if (touchEndX > touchStartX + 50) prevSlide(); // Swipe Right
         }
 
-        /* --- CONFETTI CELEBRATION --- */
+        /* --- 3. 3D TILT EFFECT FOR PHOTOS --- */
+        document.addEventListener('mousemove', (e) => {
+            if(window.innerWidth < 768) return; // Disable on mobile to save battery
+            
+            const x = (window.innerWidth / 2 - e.pageX) / 25;
+            const y = (window.innerHeight / 2 - e.pageY) / 25;
+
+            const activePhoto = slides[currentSlide].querySelector('.photo-frame');
+            if(activePhoto) {
+                activePhoto.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+            }
+        });
+
+        /* --- 4. SMART "NO" BUTTON --- */
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - 200) - (window.innerWidth / 2 - 100);
+            const y = Math.random() * (window.innerHeight - 200) - (window.innerHeight / 2 - 100);
+            
+            btn.style.position = 'absolute';
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+            
+            // Shrink it every time she tries
+            const currentScale = btn.style.scale || 1;
+            btn.style.scale = currentScale * 0.9;
+        }
+
+        /* --- 5. CELEBRATION --- */
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -332,21 +435,22 @@
         const confettiParticles = [];
 
         function celebrate() {
-            // Hide buttons
             document.querySelector('.buttons-container').style.display = 'none';
-            // Change text
-            document.querySelector('.final-slide h1').innerText = "I Knew You'd Say Yes! ❤️";
+            const finalH1 = document.querySelector('.final-slide h1');
+            finalH1.innerText = "I Love You Kannama! ❤️";
+            finalH1.style.fontSize = "5rem"; // Make it bigger
             
-            // Launch Confetti
-            for (let i = 0; i < 300; i++) {
+            // Trigger massive confetti
+            for (let i = 0; i < 500; i++) {
                 confettiParticles.push({
                     x: window.innerWidth / 2,
                     y: window.innerHeight / 2,
-                    w: Math.random() * 10 + 5,
-                    h: Math.random() * 10 + 5,
-                    dx: Math.random() * 10 - 5,
-                    dy: Math.random() * 10 - 5,
-                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                    w: Math.random() * 15 + 5,
+                    h: Math.random() * 15 + 5,
+                    dx: (Math.random() - 0.5) * 25, // Faster explosion
+                    dy: (Math.random() - 0.5) * 25,
+                    color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                    spin: Math.random() * 0.2
                 });
             }
             animateConfetti();
@@ -354,12 +458,18 @@
 
         function animateConfetti() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            confettiParticles.forEach((p, index) => {
+            confettiParticles.forEach((p) => {
                 p.x += p.dx;
                 p.y += p.dy;
-                p.dy += 0.1; // Gravity
+                p.dy += 0.15; // Gravity
+                p.x += Math.sin(p.y * 0.1) * 2; // Flutter effect
+                
                 ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.spin);
+                ctx.fillRect(0, 0, p.w, p.h);
+                ctx.restore();
             });
             requestAnimationFrame(animateConfetti);
         }
