@@ -426,7 +426,7 @@
             btn.style.scale = currentScale * 0.9;
         }
 
-        /* --- 5. CELEBRATION --- */
+        /* --- 5. CELEBRATION & WHATSAPP REDIRECT --- */
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -435,25 +435,36 @@
         const confettiParticles = [];
 
         function celebrate() {
+            // A. Visual Changes
             document.querySelector('.buttons-container').style.display = 'none';
             const finalH1 = document.querySelector('.final-slide h1');
-            finalH1.innerText = "I Love You Kannama! ❤️";
-            finalH1.style.fontSize = "5rem"; // Make it bigger
+            finalH1.innerText = "I Knew You'd Say Yes! ❤️";
+            finalH1.style.fontSize = "5rem"; 
             
-            // Trigger massive confetti
+            // B. Launch Confetti
             for (let i = 0; i < 500; i++) {
                 confettiParticles.push({
                     x: window.innerWidth / 2,
                     y: window.innerHeight / 2,
                     w: Math.random() * 15 + 5,
                     h: Math.random() * 15 + 5,
-                    dx: (Math.random() - 0.5) * 25, // Faster explosion
+                    dx: (Math.random() - 0.5) * 25, 
                     dy: (Math.random() - 0.5) * 25,
                     color: `hsl(${Math.random() * 360}, 100%, 60%)`,
                     spin: Math.random() * 0.2
                 });
             }
             animateConfetti();
+
+            // C. Redirect to WhatsApp after 2 seconds
+            setTimeout(() => {
+                // !!! REPLACE WITH YOUR NUMBER (Country Code + Number, no symbols) !!!
+                const phoneNumber = "12145345837"; 
+                const message = "I said YES! ❤️";
+                
+                // Open WhatsApp
+                window.location.href = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+            }, 2000); 
         }
 
         function animateConfetti() {
