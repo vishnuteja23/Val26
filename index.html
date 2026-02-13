@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Question for You...</title>
+    <style>
+        /* --- CORE VISUALS & RESET --- */
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff8fa3;
+            --bg: #1a0b12;
+            --text: #fff0f3;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden; /* Prevent scrolling, we handle it with JS */
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- ANIMATED BACKGROUND --- */
+        .bg-hearts {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            background: var(--primary);
+            width: 20px; height: 20px;
+            transform: rotate(45deg);
+            opacity: 0.3;
+            animation: float 10s infinite ease-in;
+        }
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .heart::before { top: -10px; left: 0; }
+        .heart::after { left: -10px; top: 0; }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(45deg) scale(0.5); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) rotate(45deg) scale(1.2); opacity: 0; }
+        }
+
+        /* --- MAIN SLIDER CONTAINER --- */
+        .container {
+            display: flex;
+            width: 500%; /* 5 Slides, so 500% width */
+            height: 100vh;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        /* --- PHOTO FRAMES --- */
+        .photo-frame {
+            width: 300px;
+            height: 400px;
+            background: var(--glass);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: rotateY(0deg) rotateX(0deg);
+            transition: transform 0.5s ease;
+            margin-bottom: 30px;
+        }
+        
+        /* 3D Tilt Effect on Hover */
+        .photo-frame:hover {
+            transform: rotateY(5deg) rotateX(5deg) scale(1.02);
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* --- TEXT STYLING --- */
+        .caption-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px 40px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.3);
+            text-align: center;
+            max-width: 80%;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease 0.3s; /* Delayed animation */
+        }
+
+        /* Class to trigger animation when slide is active */
+        .active .caption-box {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2 { font-size: 2rem; margin-bottom: 10px; color: var(--secondary); }
+        p { font-size: 1.2rem; line-height: 1.6; }
+
+        /* --- NAVIGATION --- */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        button.nav-btn {
+            background: transparent;
+            border: 2px solid var(--text);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        button.nav-btn:hover {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        /* --- THE FINAL ASK --- */
+        .final-slide h1 {
+            font-size: 3.5rem;
+            text-shadow: 0 0 20px var(--primary);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .yes-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .yes-btn:hover { transform: scale(1.1); }
+
+        .no-btn {
+            background: transparent;
+            border: 2px solid #555;
+            color: #777;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* --- CONFETTI CANVAS --- */
+        #confetti-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .photo-frame { width: 80vw; height: 50vh; }
+            .final-slide h1 { font-size: 2.5rem; }
+            .yes-btn { padding: 15px 40px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-hearts" id="hearts-container"></div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container" id="slider">
+
+        <div class="slide active">
+            <div class="photo-frame">
+                <img src="beach.JPG" alt="Our Hand Prints in Atlantic City Beach">
+            </div>
+            <div class="caption-box">
+                <h2>Hi Kannama,</h2>
+                <p>I wanted to make something special just for you...</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="photo-frame">
+                <img src="smile.JPG" alt="At Lantern Festival">
+            </div>
+            <div class="caption-box">
+                <h2>Do you remember this?</h2>
+                <p>This was such a happy day. I love your smile here.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="photo-frame">
+                <img src="rock.JPG" alt="Boone Trip">
+            </div>
+            <div class="caption-box">
+                <h2>My Favorite Moments</h2>
+                <p>Every moment with you feels like an adventure.</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div class="photo-frame">
+                <img src="bright.JPG" alt="At Dix Park">
+            </div>
+            <div class="caption-box">
+                <h2>Because of you...</h2>
+                <p>Life is brighter, funnier, and just better.</p>
+            </div>
+        </div>
+
+        <div class="slide final-slide">
+            <h1>Will you be my Valentine?</h1>
+            <div class="buttons-container">
+                <button class="yes-btn" onclick="celebrate()">YES!</button>
+                <button class="no-btn" id="noBtn" onmouseover="moveButton()">No</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="nav-btn" onclick="prevSlide()">Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next</button>
+    </div>
+
+    <script>
+        /* --- BACKGROUND HEARTS GENERATOR --- */
+        function createHearts() {
+            const container = document.getElementById('hearts-container');
+            const heartCount = 20;
+            for(let i=0; i<heartCount; i++){
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 5 + 5 + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(heart);
+            }
+        }
+        createHearts();
+
+        /* --- SLIDER LOGIC --- */
+        let currentSlide = 0;
+        const totalSlides = 5;
+        const slider = document.getElementById('slider');
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slider.style.transform = `translateX(-${currentSlide * 20}%)`;
+            
+            // Manage "active" class for text animations
+            slides.forEach(s => s.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        /* --- FUN "NO" BUTTON LOGIC --- */
+        function moveButton() {
+            const btn = document.getElementById('noBtn');
+            const x = Math.random() * 200 - 100; // Move left/right
+            const y = Math.random() * 200 - 100; // Move up/down
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        /* --- CONFETTI CELEBRATION --- */
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const confettiParticles = [];
+
+        function celebrate() {
+            // Hide buttons
+            document.querySelector('.buttons-container').style.display = 'none';
+            // Change text
+            document.querySelector('.final-slide h1').innerText = "I Knew You'd Say Yes! ❤️";
+            
+            // Launch Confetti
+            for (let i = 0; i < 300; i++) {
+                confettiParticles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 10 + 5,
+                    dx: Math.random() * 10 - 5,
+                    dy: Math.random() * 10 - 5,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiParticles.forEach((p, index) => {
+                p.x += p.dx;
+                p.y += p.dy;
+                p.dy += 0.1; // Gravity
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+            });
+            requestAnimationFrame(animateConfetti);
+        }
+    </script>
+</body>
+</html>
